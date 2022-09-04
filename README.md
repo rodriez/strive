@@ -29,7 +29,7 @@ func main() {
     }, func(e strive.Exception) {
         err := e.(error)
 
-        fmt.Printn(err)
+        fmt.Println(err)
     })
 }
 
@@ -62,7 +62,7 @@ func main() {
     }, func(e strive.Exception) {
         err := e.(error)
 
-        fmt.Printn(err)
+        fmt.Println(err)
     })
 }
 
@@ -87,7 +87,7 @@ func main() {
     }, func(e strive.Exception) {
         err := e.(error)
 
-        fmt.Printn(err)
+        fmt.Println(err)
     })
 }
 
