@@ -22,16 +22,17 @@ import (
 
 
 func main() {
-	strive.Try(func() int {
+	strive.Try(func() any {
         i := strive.Check(strconv.Atoi("XXXXX"))
 
         return i
     },
     //Catch
-    func(e strive.Exception) {
+    func(e strive.Exception) any {
         err := e.(error)
 
         fmt.Println(err)
+        return nil
     })
 }
 
@@ -59,14 +60,14 @@ func main() {
         })
 
         fmt.Println(i)
-
         return nil
     },
     //Catch
-    func(e strive.Exception) {
+    func(e strive.Exception) any {
         err := e.(error)
 
         fmt.Println(err)
+        return nil
     })
 }
 
@@ -90,10 +91,11 @@ func main() {
 		panic(err)
     },
     //Catch
-    func(e strive.Exception) {
+    func(e strive.Exception) any {
         err := e.(error)
 
         fmt.Println(err)
+        return nil
     })
 }
 
@@ -115,14 +117,15 @@ import (
 func main() {
     stri := "12345"
 
-	i := strive.Try(func() any {
+	i := strive.Try(func() int {
         return strive.Check(strconv.Atoi(stri))
     },
     //Catch
-    func(e strive.Exception) {
+    func(e strive.Exception) int {
         err := e.(error)
 
         fmt.Println(err)
+        return 0
     })
 
     fmt.Println(i)

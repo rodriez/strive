@@ -10,12 +10,12 @@ type ExactFunc[T any] func() T
 type InexactFunc[T any] func() (T, Exception)
 
 // Function with the logic to handle an exception
-type ExceptionHandler func(e Exception)
+type ExceptionHandler[T any] func(e Exception) T
 
 // Execute a function in a safe context
 // In the try context you can panic exceptional errors safely
-func Try[T any](fn ExactFunc[T], catch ExceptionHandler) T {
-	defer panicListener(catch)
+func Try[T any](fn ExactFunc[T], catch ExceptionHandler[T]) (resp T) {
+	defer panicListener(catch, &resp)
 
 	return fn()
 }
@@ -37,8 +37,8 @@ func CheckFn[T any](fn InexactFunc[T]) T {
 	return Check(fn())
 }
 
-func panicListener(catch ExceptionHandler) {
+func panicListener[T any](catch ExceptionHandler[T], output *T) {
 	if e := recover(); e != nil {
-		catch(e)
+		*output = catch(e)
 	}
 }
