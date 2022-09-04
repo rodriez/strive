@@ -26,7 +26,9 @@ func main() {
         i := strive.Check(strconv.Atoi("XXXXX"))
 
         return i
-    }, func(e strive.Exception) {
+    },
+    //Catch
+    func(e strive.Exception) {
         err := e.(error)
 
         fmt.Println(err)
@@ -59,7 +61,9 @@ func main() {
         fmt.Println(i)
 
         return nil
-    }, func(e strive.Exception) {
+    },
+    //Catch
+    func(e strive.Exception) {
         err := e.(error)
 
         fmt.Println(err)
@@ -84,11 +88,44 @@ func main() {
     strive.Try(func() any {
         err := fmt.Errorf("not implemented")
 		panic(err)
-    }, func(e strive.Exception) {
+    },
+    //Catch
+    func(e strive.Exception) {
         err := e.(error)
 
         fmt.Println(err)
     })
+}
+
+```
+
+## Usage Try in success case
+
+```go
+package main
+
+import (
+    "fmt"
+	"strconv"
+
+    "github.com/rodriez/strive"
+)
+
+
+func main() {
+    stri := "12345"
+
+	i := strive.Try(func() any {
+        return strive.Check(strconv.Atoi(stri))
+    },
+    //Catch
+    func(e strive.Exception) {
+        err := e.(error)
+
+        fmt.Println(err)
+    })
+
+    fmt.Println(i)
 }
 
 ```
