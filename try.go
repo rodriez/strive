@@ -1,44 +1,62 @@
 package strive
 
-// Error throwed with panic
-type Exception any
-
 // Function without expected errors
-type ExactFunc[T any] func() T
+type ExactFn[T any] func() T
 
 // Function with expected errors
-type InexactFunc[T any] func() (T, Exception)
+type InexactFn[T any] func() (T, error)
+
+// Function with the logic to convert an exception
+type ExceptionMapper[T any] func(e error) T
 
 // Function with the logic to handle an exception
-type ExceptionHandler[T any] func(e Exception) T
+type ExceptionHandler func(e error)
 
 // Execute a function in a safe context
 // In the try context you can panic exceptional errors safely
-func Try[T any](fn ExactFunc[T], catch ExceptionHandler[T]) (resp T) {
-	defer panicListener(catch, &resp)
+func Try[T any](fn ExactFn[T], catch ExceptionMapper[T]) (resp T) {
+	defer panicMapper(catch, &resp)
 
 	return fn()
+}
+
+// Execute a function in a safe context
+// In the Strive context you can panic exceptional errors safely
+func Strive(cmd func(), catch ExceptionHandler) {
+	defer panicHandler(catch)
+
+	cmd()
 }
 
 // If exception is not nil throw(panic) the exception
 // Otherwise return the expected response
 // Should be called only un Try context
-func Check[T any](r T, e Exception) T {
+func Check[T any](r T, e error) T {
+	CheckError(e)
+
+	return r
+}
+
+func CheckError(e error) {
 	if e != nil {
 		panic(e)
-	} else {
-		return r
 	}
 }
 
 // Run the fn checking for exception
 // Should be called only un Try context
-func CheckFn[T any](fn InexactFunc[T]) T {
+func CheckFn[T any](fn InexactFn[T]) T {
 	return Check(fn())
 }
 
-func panicListener[T any](catch ExceptionHandler[T], output *T) {
+func panicMapper[T any](mapFn ExceptionMapper[T], output *T) {
 	if e := recover(); e != nil {
-		*output = catch(e)
+		*output = mapFn(e.(error))
+	}
+}
+
+func panicHandler(catch ExceptionHandler) {
+	if e := recover(); e != nil {
+		catch(e.(error))
 	}
 }

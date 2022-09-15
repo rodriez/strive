@@ -10,109 +10,98 @@ import (
 )
 
 func TestTryCatchingPanic(t *testing.T) {
-	errorWasThrown := false
-	strive.Try(func() any {
+	thrown := strive.Try(func() bool {
 		var d, n int
 
 		i := int(d / n)
+		fmt.Println(i)
 
-		return i
-	}, func(e strive.Exception) any {
-		errorWasThrown = true
-		err := e.(error)
-
-		assert.EqualError(t, err, "runtime error: integer divide by zero")
-		return nil
+		return false
+	}, func(e error) bool {
+		assert.EqualError(t, e, "runtime error: integer divide by zero")
+		return true
 	})
 
-	if !errorWasThrown {
-		assert.Fail(t, "An exception was expected but nothing was throwed")
+	if !thrown {
+		assert.Fail(t, "An exception was expected but nothing was thrown")
 	}
 }
 
 func TestTryCatchingLiteralPanic(t *testing.T) {
-	errorWasThrown := false
-	strive.Try(func() any {
+	thrown := strive.Try(func() bool {
 		err := fmt.Errorf("an error happened")
 		panic(err)
-	}, func(e strive.Exception) any {
-		errorWasThrown = true
-		err := e.(error)
+	}, func(e error) bool {
 
-		assert.EqualError(t, err, "an error happened")
-		return nil
+		assert.EqualError(t, e, "an error happened")
+		return true
 	})
 
-	if !errorWasThrown {
-		assert.Fail(t, "An exception was expected but nothing was throwed")
+	if !thrown {
+		assert.Fail(t, "An exception was expected but nothing was thrown")
 	}
 }
 
-func TestTryCatchingPanicThrowedInOtherFunction(t *testing.T) {
-	errorWasThrown := false
-	strive.Try(func() any {
+func TestTryCatchingPanicThrownInOtherFunction(t *testing.T) {
+	thrown := strive.Try(func() bool {
 		producePanic()
-
-		return nil
-	}, func(e strive.Exception) any {
-		errorWasThrown = true
-		err := e.(error)
-
-		assert.EqualError(t, err, "a panic has been throwed")
-		return nil
+		return false
+	}, func(e error) bool {
+		assert.EqualError(t, e, "a panic has been thrown")
+		return true
 	})
 
-	if !errorWasThrown {
-		assert.Fail(t, "An exception was expected but nothing was throwed")
+	if !thrown {
+		assert.Fail(t, "An exception was expected but nothing was thrown")
 	}
 }
 
 func producePanic() {
-	panic(fmt.Errorf("a panic has been throwed"))
+	panic(fmt.Errorf("a panic has been thrown"))
 }
 
 func TestTryWithCheck(t *testing.T) {
-	errorWasThrown := false
-	strive.Try(func() any {
-		return strive.Check(strconv.Atoi("XXXXX"))
-	}, func(e strive.Exception) any {
-		errorWasThrown = true
-		err := e.(error)
+	thrown := strive.Try(func() bool {
+		i := strive.Check(strconv.Atoi("XXXXX"))
 
-		assert.EqualError(t, err, "strconv.Atoi: parsing \"XXXXX\": invalid syntax")
-		return nil
+		fmt.Println(i)
+
+		return false
+	}, func(e error) bool {
+		assert.EqualError(t, e, "strconv.Atoi: parsing \"XXXXX\": invalid syntax")
+		return true
 	})
 
-	if !errorWasThrown {
-		assert.Fail(t, "An exception was expected but nothing was throwed")
+	if !thrown {
+		assert.Fail(t, "An exception was expected but nothing was thrown")
 	}
 }
 
 func TestTryWithCheckFunction(t *testing.T) {
-	errorWasThrown := false
-	strive.Try(func() any {
-		return strive.CheckFn(func() (int, strive.Exception) {
+	thrown := strive.Try(func() bool {
+		i := strive.CheckFn(func() (int, error) {
 			return strconv.Atoi("XXXXX")
 		})
-	}, func(e strive.Exception) any {
-		errorWasThrown = true
-		err := e.(error)
 
-		assert.EqualError(t, err, "strconv.Atoi: parsing \"XXXXX\": invalid syntax")
-		return nil
+		fmt.Println(i)
+
+		return false
+	}, func(e error) bool {
+		assert.EqualError(t, e, "strconv.Atoi: parsing \"XXXXX\": invalid syntax")
+		return true
 	})
 
-	if !errorWasThrown {
-		assert.Fail(t, "An exception was expected but nothing was throwed")
+	if !thrown {
+		assert.Fail(t, "An exception was expected but nothing was thrown")
 	}
 }
 
 func TestTryWithCheckFnFailRecover(t *testing.T) {
 	i := strive.Try(func() int {
-		return strive.CheckFn(func() (int, strive.Exception) {
+		return strive.CheckFn(func() (int, error) {
 			return strconv.Atoi("XXXX")
 		})
-	}, func(e strive.Exception) int {
+	}, func(e error) int {
 		return 111
 	})
 
@@ -121,13 +110,35 @@ func TestTryWithCheckFnFailRecover(t *testing.T) {
 
 func TestTryWithCheckFnOK(t *testing.T) {
 	i := strive.Try(func() int {
-		return strive.CheckFn(func() (int, strive.Exception) {
+		return strive.CheckFn(func() (int, error) {
 			return strconv.Atoi("111")
 		})
-	}, func(e strive.Exception) int {
-		assert.Fail(t, fmt.Sprintf("Unexpected exception throwed %+v", e))
+	}, func(e error) int {
+		assert.Fail(t, fmt.Sprintf("Unexpected exception thrown %+v", e))
 		return 0
 	})
 
 	assert.Equal(t, i, 111)
+}
+
+func TestStriveCatchingPanic(t *testing.T) {
+	strive.Strive(func() {
+		var d, n int
+
+		i := int(d / n)
+		fmt.Println(i)
+
+		assert.Fail(t, "An exception was expected but nothing was thrown")
+	}, func(e error) {
+		assert.EqualError(t, e, "runtime error: integer divide by zero")
+	})
+}
+
+func TestStriveCatchingLiteralPanic(t *testing.T) {
+	strive.Strive(func() {
+		err := fmt.Errorf("an error happened")
+		panic(err)
+	}, func(e error) {
+		assert.EqualError(t, e, "an error happened")
+	})
 }

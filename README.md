@@ -8,6 +8,30 @@ Helper for error propagation a handling in GO
 go get github.com/rodriez/strive
 ```
 
+## Usage Strive with Check
+
+```go
+package main
+
+import (
+    "fmt"
+	"strconv"
+    
+    "github.com/rodriez/strive"
+)
+
+
+func main() {
+	strive.Strive(func() {
+        i := strive.Check(strconv.Atoi("XXXXX"))
+        fmt.Println(i)
+    }, func(err error) any {
+        fmt.Println(err)
+    })
+}
+
+```
+
 ## Usage Try with Check
 
 ```go
@@ -22,23 +46,19 @@ import (
 
 
 func main() {
-	strive.Try(func() any {
-        i := strive.Check(strconv.Atoi("XXXXX"))
-
-        return i
-    },
-    //Catch
-    func(e strive.Exception) any {
-        err := e.(error)
-
+	i := strive.Try(func() int {
+        return strive.Check(strconv.Atoi("XXXXX"))    
+    }, func(err error) int {
         fmt.Println(err)
-        return nil
+        return 0
     })
+
+    fmt.Println(i)
 }
 
 ```
 
-## Usage Try with CheckFn
+## Usage Strive with CheckFn
 
 ```go
 package main
@@ -54,26 +74,20 @@ import (
 func main() {
     stri := "XXXXX"
 
-	strive.Try(func() any {
+	strive.Strive(func() {
         i := strive.CheckFn(func() (int, strive.Exception) {
             return strconv.Atoi(stri)
         })
 
         fmt.Println(i)
-        return nil
-    },
-    //Catch
-    func(e strive.Exception) any {
-        err := e.(error)
-
+    }, func(err error) {
         fmt.Println(err)
-        return nil
     })
 }
 
 ```
 
-## Usage Try with literal panic
+## Usage Strive with literal panic
 
 ```go
 package main
@@ -86,16 +100,11 @@ import (
 
 
 func main() {
-    strive.Try(func() any {
+    strive.Strive(func() {
         err := fmt.Errorf("not implemented")
-		panic(err)
-    },
-    //Catch
-    func(e strive.Exception) any {
-        err := e.(error)
-
+		strive.CheckError(err)
+    }, func(err error) {    
         fmt.Println(err)
-        return nil
     })
 }
 
@@ -119,13 +128,9 @@ func main() {
 
 	i := strive.Try(func() int {
         return strive.Check(strconv.Atoi(stri))
-    },
-    //Catch
-    func(e strive.Exception) int {
-        err := e.(error)
-
+    }, func(e error) int {
         fmt.Println(err)
-        return 0
+        return -1
     })
 
     fmt.Println(i)
