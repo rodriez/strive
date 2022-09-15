@@ -9,6 +9,7 @@ go get github.com/rodriez/strive
 ```
 
 ## Usage Strive with Check
+[Try it](https://go.dev/play/p/yqfYOAOSUyj)
 
 ```go
 package main
@@ -25,7 +26,7 @@ func main() {
 	strive.Strive(func() {
         i := strive.Check(strconv.Atoi("XXXXX"))
         fmt.Println(i)
-    }, func(err error) any {
+    }, func(err error) {
         fmt.Println(err)
     })
 }
@@ -33,6 +34,7 @@ func main() {
 ```
 
 ## Usage Try with Check
+[Try it](https://go.dev/play/p/lvQS5ESdgI3)
 
 ```go
 package main
@@ -59,6 +61,7 @@ func main() {
 ```
 
 ## Usage Strive with CheckFn
+[Try it](https://go.dev/play/p/lJ142OEN-BO)
 
 ```go
 package main
@@ -75,7 +78,7 @@ func main() {
     stri := "XXXXX"
 
 	strive.Strive(func() {
-        i := strive.CheckFn(func() (int, strive.Exception) {
+        i := strive.CheckFn(func() (int, error) {
             return strconv.Atoi(stri)
         })
 
@@ -88,6 +91,7 @@ func main() {
 ```
 
 ## Usage Strive with literal panic
+[Try it](https://go.dev/play/p/Ulphqmr--Qk)
 
 ```go
 package main
@@ -111,6 +115,7 @@ func main() {
 ```
 
 ## Usage Try in success case
+[Try it](https://go.dev/play/p/1Odvi4zPhaF)
 
 ```go
 package main
@@ -128,7 +133,7 @@ func main() {
 
 	i := strive.Try(func() int {
         return strive.Check(strconv.Atoi(stri))
-    }, func(e error) int {
+    }, func(err error) int {
         fmt.Println(err)
         return -1
     })
@@ -137,3 +142,10 @@ func main() {
 }
 
 ```
+
+## Contributing
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+
+Please make sure to update tests as appropriate.
+
+[Hey 👋 buy me a beer! ](https://www.buymeacoffee.com/rodriez)
