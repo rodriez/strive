@@ -1,6 +1,8 @@
 # strive
 Helper for error propagation a handling in GO
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/rodriez/strive)](https://goreportcard.com/report/github.com/rodriez/strive)   [![PkgGoDev](https://pkg.go.dev/badge/github.com/rodriez/strive)](https://pkg.go.dev/github.com/rodriez/strive)
+
 
 ## Installation
 
